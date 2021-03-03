@@ -32,9 +32,9 @@
         "envtag": "dev",
         "vmnumber_pad": "[padLeft(parameters('vmnumber'), 3, '0')]",
         "vmname": "[concat('vm-', variables('service'), '-', variables('region'), '-', variables('vmnumber_pad'))]",
-        "nic_name": "[concat('nic-', variables('vmname'), '-public')]",
+        "nic_name": "[concat('nic-', variables('vmname'), '-private')]",
         "vnet": "[concat('vnet-', variables('service'), '-uks-001')]",
-        "subnet": "[concat('snet-', variables('service'), '-vm-public-uks-001')]",
+        "subnet": "[concat('snet-', variables('service'), '-vm-uks-001')]",
         "osdisk": "[concat('osdisk-', variables('vmname'))]",
         "rgnetwork": "[concat('rg-', variables('service'), '-network-uks-001')]"
     },
@@ -88,7 +88,7 @@
                     "imageReference": {
                         "publisher": "Canonical",
                         "offer": "UbuntuServer",
-                        "sku": "16.04-LTS",
+                        "sku": "18.04-LTS",
                         "version": "latest"
                     },
                     "osDisk": {
