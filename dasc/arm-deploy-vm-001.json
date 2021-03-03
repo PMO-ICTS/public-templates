@@ -2,10 +2,10 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "vmname": {
+        "vmnumber": {
             "type": "String",
             "metadata": {
-                "description": "Virtual Machine name"
+                "description": "Virtual Machine Number"
             }
         },
         "vmsize": {
@@ -27,10 +27,15 @@
     },
     "variables": {
         "service": "datascience",
-        "nicname": "[concat('nic-', parameters('vmname'), '-001')]",
+        "region": "uks",
+        "apptag": "datasci",
+        "envtag": "dev",
+        "vmnumber_pad": "[padLeft(parameters('vmnumber'), 3, '0')]",
+        "vmname": "[concat('vm-', variables('service'), '-', variables('region'), '-', variables('vmnumber_pad'))]",
+        "nic_name": "[concat('nic-', variables('vmname'), '-public')]",
         "vnet": "[concat('vnet-', variables('service'), '-uks-001')]",
-        "subnet": "[concat('snet-', variables('service'), '-vm-uks-001')]",
-        "osdisk": "[concat('osdisk-', parameters('vmname'), '-001')]",
+        "subnet": "[concat('snet-', variables('service'), '-vm-public-uks-001')]",
+        "osdisk": "[concat('osdisk-', variables('vmname'))]",
         "rgnetwork": "[concat('rg-', variables('service'), '-network-uks-001')]"
     },
     "functions": [],
@@ -38,15 +43,18 @@
         {
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-11-01",
-            "name": "[variables('nicname')]",
+            "name": "[variables('nic_name')]",
             "location": "[resourceGroup().location]",
+            "tags": {
+                "app": "[variables('apptag')]",
+                "env": "[variables('envtag')]"
+            },
             "properties": {
                 "ipConfigurations": [
                     {
                         "name": "ipConfig1",
-                        "properties": 
-                        {                     
-                             "privateIPAllocationMethod": "Dynamic",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
                                 "id": "[resourceId(variables('rgnetwork'),'Microsoft.Network/virtualNetworks/subnets', variables('vnet'), variables('subnet'))]"
                             }
@@ -58,17 +66,21 @@
         {
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-07-01",
-            "name": "[parameters('vmname')]",
+            "name": "[variables('vmname')]",
             "location": "[resourceGroup().location]",
-             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces', variables('nicname'))]"
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('nic_name'))]"
             ],
+            "tags": {
+                "app": "[variables('apptag')]",
+                "env": "[variables('envtag')]"
+            },
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "[parameters('vmsize')]"
                 },
                 "osProfile": {
-                    "computerName": "[parameters('vmname')]",
+                    "computerName": "[variables('vmname')]",
                     "adminUsername": "[parameters('username')]",
                     "adminPassword": "[parameters('password')]"
                 },
@@ -88,7 +100,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicname'))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('nic_name'))]"
                         }
                     ]
                 },
