@@ -5,17 +5,17 @@
         "vmnumber": {
             "type": "String",
             "metadata": {
-                "description": "Virtual Machine Number"
+                "description": "Virtual machine number"
             }
         },
         "vmsize": {
             "allowedValues": [
-                "Standard_B1ls",
-                "Standard_A2_v2"
+                "Standard_B2s",
+                "Standard_B1ms"
             ],
             "type": "String",
             "metadata": {
-                "description": "description"
+                "description": "Virtual machine size"
             }
         },
         "username": {
